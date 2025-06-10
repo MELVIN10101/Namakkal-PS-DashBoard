@@ -1,4 +1,5 @@
 export interface CaseData {
+  District: any;
   id: string;
   district: string;
   Police_Station: string;

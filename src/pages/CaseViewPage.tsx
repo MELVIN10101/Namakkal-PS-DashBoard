@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../components/UI/Card';
 import { Button } from '../components/UI/Button';
 import { Modal } from '../components/UI/Modal';
-import { CaseForm } from '../components/Forms/CaseForm';
-import { useCaseData } from '../hooks/useCaseData';
 import { exportToPDF, exportToExcel } from '../utils/export';
 import { 
   Eye, 
@@ -16,13 +14,40 @@ import {
   X
 } from 'lucide-react';
 import type { CaseData } from '../types';
+import caseApi from '../services/caseApi';
 
 export const CaseViewPage: React.FC = () => {
-  const { cases, allCases, filters, setFilters, updateCase, deleteCase } = useCaseData();
+  const [allCases, setAllCases] = useState<CaseData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
   const [selectedCase, setSelectedCase] = useState<CaseData | null>(null);
   const [editingCase, setEditingCase] = useState<CaseData | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');  const [filters, setFilters] = useState<Record<string, string | undefined>>({});
+
+  // Fetch cases from API
+  useEffect(() => {
+    const fetchCases = async () => {
+      try {
+        setLoading(true);
+        const response = await caseApi.getAllcase();
+        console.log('Fetched cases:', response);
+        
+        // Handle different response formats
+        const casesData = response.data || response || [];
+        setAllCases(Array.isArray(casesData) ? casesData : []);
+        setError('');
+      } catch (error) {
+        console.error('Error fetching cases:', error);
+        setError('Failed to fetch cases. Please try again.');
+        setAllCases([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCases();
+  }, []);
 
   const handleView = (case_: CaseData) => {
     setSelectedCase(case_);
@@ -32,21 +57,21 @@ export const CaseViewPage: React.FC = () => {
     setEditingCase(case_);
   };
 
-  const handleUpdate = (updatedData: any) => {
-    if (editingCase) {
-      updateCase(editingCase.id, updatedData);
-      setEditingCase(null);
-    }
-  };
-
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this case?')) {
-      deleteCase(id);
+      try {
+        // For now, just remove from local state
+        // In future, implement API call for delete
+        setAllCases(prev => prev.filter(case_ => case_.id !== id));
+        console.log('Case deleted:', id);
+      } catch (error) {
+        console.error('Error deleting case:', error);
+      }
     }
   };
 
   const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({
+    setFilters((prev: Record<string, string | undefined>) => ({
       ...prev,
       [key]: value || undefined,
     }));
@@ -57,16 +82,26 @@ export const CaseViewPage: React.FC = () => {
     setSearchTerm('');
   };
 
-  const filteredCases = cases.filter(case_ =>
-    !searchTerm || Object.values(case_).some(value =>
+  // Filter cases based on search term and filters
+  const filteredCases = allCases.filter((case_: CaseData) => {
+    // Search filter
+    const matchesSearch = !searchTerm || Object.values(case_).some(value =>
       String(value).toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+    );
+
+    // Other filters
+    const matchesFilters = Object.entries(filters).every(([key, value]) => {
+      if (!value) return true;
+      const caseValue = case_[key as keyof CaseData];
+      return String(caseValue).toLowerCase().includes(String(value).toLowerCase());
+    });
+
+    return matchesSearch && matchesFilters;
+  });
 
   const uniqueValues = (key: keyof CaseData) => {
-    return [...new Set(allCases.map(case_ => case_[key]))].filter(Boolean);
+    return [...new Set(allCases.map((case_: CaseData) => case_[key]))].filter(Boolean);
   };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -96,19 +131,40 @@ export const CaseViewPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Search Bar */}
-      <Card>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search cases..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-          />
-        </div>
-      </Card>
+      {/* Loading State */}
+      {loading && (
+        <Card>
+          <div className="text-center py-12">
+            <p className="text-gray-500 dark:text-gray-400">Loading cases...</p>
+          </div>
+        </Card>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <Card>
+          <div className="text-center py-12">
+            <p className="text-red-500 dark:text-red-400">{error}</p>
+          </div>
+        </Card>
+      )}
+
+      {/* Content - only show when not loading */}
+      {!loading && (
+        <>
+          {/* Search Bar */}
+          <Card>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search cases..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              />
+            </div>
+          </Card>
 
       {/* Filters */}
       {showFilters && (
@@ -119,13 +175,13 @@ export const CaseViewPage: React.FC = () => {
                 District
               </label>
               <select
-                value={filters.district || ''}
+                value={filters.District || ''}
                 onChange={(e) => handleFilterChange('district', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
               >
                 <option value="">All Districts</option>
                 {uniqueValues('district').map(district => (
-                  <option key={district} value={String(district)}>{String(district)}</option>
+                  <option key={District} value={String(district)}>{String(district)}</option>
                 ))}
               </select>
             </div>
@@ -210,43 +266,48 @@ export const CaseViewPage: React.FC = () => {
                   <td className="py-3 px-4 text-gray-900 dark:text-white">{case_.Accused_Name}</td>
                   <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.Crime_type}</td>
                   <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.Year}</td>
-                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.district}</td>
+                  <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.District}</td>
                   <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.Accused_Gender}</td>
                   <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.Accused_Age}</td>
-                  <td className="py-3 px-4">
-                    <div className="flex justify-center space-x-2">
+                  <td className="py-3 px-4">                    <div className="flex justify-center space-x-2">
                       <Button
                         size="sm"
                         variant="secondary"
                         icon={Eye}
                         onClick={() => handleView(case_)}
-                      />
+                      >
+                        View
+                      </Button>
                       <Button
                         size="sm"
                         variant="secondary"
                         icon={Edit}
                         onClick={() => handleEdit(case_)}
-                      />
+                      >
+                        Edit
+                      </Button>
                       <Button
                         size="sm"
                         variant="danger"
                         icon={Trash2}
                         onClick={() => handleDelete(case_.id)}
-                      />
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
-
-          {filteredCases.length === 0 && (
+          </table>          {filteredCases.length === 0 && !loading && (
             <div className="text-center py-12">
               <p className="text-gray-500 dark:text-gray-400">No cases found</p>
             </div>
           )}
         </div>
       </Card>
+        </>
+      )}
 
       {/* View Modal */}
       <Modal
@@ -260,7 +321,7 @@ export const CaseViewPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">District</label>
-                <p className="text-gray-900 dark:text-white">{selectedCase.district}</p>
+                <p className="text-gray-900 dark:text-white">{selectedCase.District}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Police Station</label>
@@ -309,9 +370,7 @@ export const CaseViewPage: React.FC = () => {
             </div>
           </div>
         )}
-      </Modal>
-
-      {/* Edit Modal */}
+      </Modal>      {/* Edit Modal */}
       <Modal
         isOpen={!!editingCase}
         onClose={() => setEditingCase(null)}
@@ -319,12 +378,16 @@ export const CaseViewPage: React.FC = () => {
         size="xl"
       >
         {editingCase && (
-          <CaseForm
-            initialData={editingCase}
-            onSubmit={handleUpdate}
-            onCancel={() => setEditingCase(null)}
-            submitLabel="Update Case"
-          />
+          <div className="p-4">
+            <p className="text-gray-600 dark:text-gray-400">
+              Edit functionality is not available. Please use the Case Entry page to add new cases.
+            </p>
+            <div className="flex justify-end mt-4">
+              <Button onClick={() => setEditingCase(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
         )}
       </Modal>
     </div>

@@ -23,7 +23,7 @@ export const exportToPDF = (data: CaseData[], filename: string = 'cases-export')
     case_.Accused_Name,
     case_.Crime_type,
     case_.Year.toString(),
-    case_.district,
+    case_.District,
     case_.Police_Station,
     case_.Accused_Gender,
     case_.Accused_Age.toString(),
@@ -53,7 +53,7 @@ export const exportToPDF = (data: CaseData[], filename: string = 'cases-export')
 export const exportToExcel = (data: CaseData[], filename: string = 'cases-export') => {
   const worksheet = XLSX.utils.json_to_sheet(data.map(case_ => ({
     'CR Number': case_.CR_NO,
-    'District': case_.district,
+    'District': case_.District,
     'Police Station': case_.Police_Station,
     'Section of Law': case_.Section_of_law,
     'Crime Type': case_.Crime_type,
