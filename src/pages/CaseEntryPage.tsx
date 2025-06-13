@@ -3,6 +3,7 @@ import { Card } from '../components/UI/Card';
 import { CheckCircle, AlertCircle, Save, X } from 'lucide-react';
 import { Button } from '../components/UI/Button';
 import caseApi from '../services/caseApi';
+import { PageProps } from '../types';
 
 const CRIME_TYPES = [
   'Theft', 'Assault', 'Fraud', 'Robbery', 'Vandalism', 
@@ -12,7 +13,7 @@ const CRIME_TYPES = [
 const YEARS = Array.from({ length: 6 }, (_, i) => 2000 + i);
 const GENDERS = ['Male', 'Female', 'Others'];
 
-export const CaseEntryPage: React.FC = () => {
+export const CaseEntryPage: React.FC<PageProps> = ({ onNavigate }) => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [loading, setLoading] = useState(false);

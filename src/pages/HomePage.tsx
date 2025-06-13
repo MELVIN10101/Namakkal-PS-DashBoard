@@ -5,8 +5,11 @@ import { BarChart } from '../components/Charts/BarChart';
 import { LineChart } from '../components/Charts/LineChart';
 import { useCaseData } from '../hooks/useCaseData';
 import { Clock, TrendingUp, Users, AlertTriangle } from 'lucide-react';
+import { PageProps } from '../types';
 
-export const HomePage: React.FC = () => {
+// Using PageProps from types
+
+export const HomePage: React.FC<PageProps> = ({ onNavigate }) => {
   const { allCases, loading } = useCaseData();
 
   if (loading) {

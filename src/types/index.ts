@@ -29,6 +29,20 @@ export interface FilterOptions {
 
 export type ThemeMode = 'light' | 'dark';
 
+export interface User {
+  id?: string;
+  user_name: string;
+  user_role: 'admin' | 'user';
+  is_admin?: string;
+  email?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface PageProps {
+  onNavigate?: (page: string) => void;
+}
+
 export interface AnalyticsFilters {
   xAxis: string;
   yAxis: string;

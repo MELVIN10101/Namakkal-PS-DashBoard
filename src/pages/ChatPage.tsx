@@ -3,6 +3,7 @@ import { Card } from '../components/UI/Card';
 import { Button } from '../components/UI/Button';
 import { Modal } from '../components/UI/Modal';
 import { Send, Bot, User, CreditCard } from 'lucide-react';
+import { PageProps } from '../types';
 
 interface Message {
   id: string;
@@ -11,7 +12,7 @@ interface Message {
   timestamp: Date;
 }
 
-export const ChatPage: React.FC = () => {
+export const ChatPage: React.FC<PageProps> = ({ onNavigate }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
