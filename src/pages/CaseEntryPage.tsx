@@ -272,12 +272,11 @@ export const CaseEntryPage: React.FC<PageProps> = ({ onNavigate }) => {
                     Age
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     name="Accused_Age"
                     value={formData.Accused_Age}
                     onChange={handleChange}
-                    min="1"
-                    max="120"
+                   
                     required
                     disabled={loading}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
