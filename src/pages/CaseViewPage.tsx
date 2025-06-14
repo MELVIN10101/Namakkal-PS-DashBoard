@@ -169,13 +169,25 @@ export const CaseViewPage: React.FC<PageProps> = ({ onNavigate }) => {
     setSearchTerm('');
     setCurrentPage(1); // Reset to first page when clearing filters
   };
-
   // Filter cases based on search term and filters
   const filteredCases = allCases.filter((case_: CaseData) => {
-    // Search filter
-    const matchesSearch = !searchTerm || Object.values(case_).some(value =>
-      String(value).toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Search filter - only search in specific relevant fields, excluding ID
+    const searchFields = [
+      'Accused_Name',
+      'Accused_Nick_Name', 
+      'Crime_type',
+      'district',
+      'Police_Station',
+      'Section_of_law',
+      'Guardian',
+      'Accused_Address',
+      'CR_NO'
+    ];
+    
+    const matchesSearch = !searchTerm || searchFields.some(field => {
+      const value = case_[field as keyof CaseData];
+      return value && String(value).toLowerCase().includes(searchTerm.toLowerCase());
+    });
 
     // Other filters
     const matchesFilters = Object.entries(filters).every(([key, value]) => {
@@ -226,7 +238,19 @@ export const CaseViewPage: React.FC<PageProps> = ({ onNavigate }) => {
           </Button>          <Button
             variant="secondary"
             icon={Download}
-            onClick={() => exportToExcel(filteredCases)}
+            onClick={() => {
+              try {
+                const success = exportToExcel(filteredCases);
+                if (success) {
+                  // Could add a toast notification here if the app has that functionality
+                  console.log('Excel exported successfully');
+                }
+              } catch (error) {
+                console.error('Failed to export Excel:', error);
+                // Could show an error message to the user here
+                alert('Failed to export to Excel. Please try again.');
+              }
+            }}
           >
             Export Excel
           </Button>

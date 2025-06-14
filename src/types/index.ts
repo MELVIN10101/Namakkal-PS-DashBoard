@@ -35,6 +35,15 @@ export interface User {
   user_role: 'admin' | 'user';
   is_admin?: string;
   email?: string;
+  case_entry?: string;      // "0" = no access, "1" = has access
+  case_view?: string;       // "0" = no access, "1" = has access
+  analytics?: string;       // "0" = no access, "1" = has access
+  chat?: string;            // "0" = no access, "1" = has access
+  // For backward compatibility
+  case_entry_access?: number;
+  case_view_access?: number;
+  analytics_access?: number;
+  chat_access?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }

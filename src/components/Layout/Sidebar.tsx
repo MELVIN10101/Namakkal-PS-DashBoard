@@ -20,14 +20,15 @@ interface SidebarProps {
   onPageChange: (page: string) => void;
 }
 
+// Define navigation items with required permissions
 const navItems = [
-  { id: 'home', label: 'Home', icon: Home },
-  { id: 'case-entry', label: 'Case Entry', icon: FileText },
-  { id: 'case-view', label: 'Case View', icon: Eye },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-  { id: 'chat', label: 'Chat', icon: MessageCircle },
-  { id: 'register', label: 'Register User', icon: UserPlus },
-  { id: 'user-list', label: 'User List', icon: Users },
+  { id: 'home', label: 'Home', icon: Home, permission: null }, // All users see home
+  { id: 'case-entry', label: 'Case Entry', icon: FileText, permission: 'case_entry' },
+  { id: 'case-view', label: 'Case View', icon: Eye, permission: 'case_view' },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3, permission: 'analytics' },
+  { id: 'chat', label: 'Chat', icon: MessageCircle, permission: 'chat' },
+  { id: 'register', label: 'Register User', icon: UserPlus, permission: 'admin_only' },
+  { id: 'user-list', label: 'User List', icon: Users, permission: 'admin_only' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) => {
@@ -59,17 +60,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, onPageChange }) =
             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
               <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+            <div>              <p className="text-sm font-medium text-gray-900 dark:text-white">
                 {user?.user_name || 'Admin'}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Officer</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {user?.user_role === 'admin' ? 'Administrator' : 'Standard User'}
+              </p>
             </div>
           </div>
-        </div>
-
-        <nav className="space-y-2 flex-1">
-          {navItems.map((item) => {
+        </div>        <nav className="space-y-2 flex-1">
+          {navItems.filter(item => {
+            // Admin sees everything
+            if (user?.user_role === 'admin') {
+              return true;
+            }
+            
+            // Home is for everyone
+            if (item.permission === null) {
+              return true;
+            }
+            
+            // Admin-only pages are filtered out for regular users
+            if (item.permission === 'admin_only') {
+              return false;
+            }
+            
+            // Check specific permissions
+            return user?.[item.permission as keyof typeof user] === "1";
+          }).map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
             

@@ -3,14 +3,15 @@ import { Card } from '../components/UI/Card';
 import { PieChart } from '../components/Charts/PieChart';
 import { BarChart } from '../components/Charts/BarChart';
 import { LineChart } from '../components/Charts/LineChart';
-import { useCaseData } from '../hooks/useCaseData';
-import { Clock, TrendingUp, Users, AlertTriangle } from 'lucide-react';
-import { PageProps } from '../types';
 
-// Using PageProps from types
+import { useCaseData } from '../hooks/useCaseData';
+import { Clock, TrendingUp, Users, AlertTriangle, Home, FileText, Eye, BarChart3, MessageCircle, UserPlus } from 'lucide-react';
+import { PageProps } from '../types';
+import { useAuth } from '../hooks/useAuth';
 
 export const HomePage: React.FC<PageProps> = ({ onNavigate }) => {
   const { allCases, loading } = useCaseData();
+  const { user } = useAuth();
 
   if (loading) {
     return (
@@ -19,6 +20,8 @@ export const HomePage: React.FC<PageProps> = ({ onNavigate }) => {
       </div>
     );
   }
+  
+  
 
   // Prepare chart data
   const crimeTypeData = allCases.reduce((acc, case_) => {
@@ -93,6 +96,8 @@ export const HomePage: React.FC<PageProps> = ({ onNavigate }) => {
 
   return (
     <div className="space-y-8">
+      
+      
       {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">

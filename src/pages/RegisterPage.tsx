@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { Card } from '../components/UI/Card';
 import { Button } from '../components/UI/Button';
+import { ToggleSwitch } from '../components/UI/ToggleSwitch';
 import { UserPlus, AlertCircle, Check } from 'lucide-react';
 import authService from '../services/auth';
 import { PageProps } from '../types';
 
-const RegisterPage: React.FC<PageProps> = ({ onNavigate }) => {
-  const [username, setUsername] = useState('');
+const RegisterPage: React.FC<PageProps> = ({ onNavigate }) => {  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<'admin' | 'user'>('user');
+  const [role, setRole] = useState<'admin' | 'user'>('user'); 
+   const [caseEntry, setCaseEntry] = useState("0");
+  const [caseView, setCaseView] = useState("0");
+  const [analytics, setAnalytics] = useState("0");
+  const [chat, setChat] = useState("0");
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -30,22 +34,25 @@ const RegisterPage: React.FC<PageProps> = ({ onNavigate }) => {
       return;
     }
 
-    setIsRegistering(true);
-
-    try {      await authService.register({
+    setIsRegistering(true);    try {      await authService.register({
         user_name: username,
         password: password,
         user_role: role,
+        case_entry: caseEntry,
+        case_view: caseView,
+        analytics: analytics,
+        chat: chat
       });
-      // Registration successful
-
-      setSuccess('User registered successfully');
+      // Registration successful      setSuccess('User registered successfully');
       // Reset form
       setUsername('');
       setPassword('');
       setConfirmPassword('');
-      
       setRole('user');
+      setCaseEntry("0");
+      setCaseView("0");
+      setAnalytics("0");
+      setChat("0");
     } catch (err: any) {
       console.error('Registration error:', err);
       const errorMessage = err.response?.data?.message || 'Failed to register user. Please try again.';
@@ -138,9 +145,7 @@ const RegisterPage: React.FC<PageProps> = ({ onNavigate }) => {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600"
                 placeholder="Confirm password"
               />
-            </div>
-
-            <div className="space-y-1">
+            </div>            <div className="space-y-1">
               <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 User Role *
               </label>
@@ -155,7 +160,39 @@ const RegisterPage: React.FC<PageProps> = ({ onNavigate }) => {
                 <option value="admin">Admin</option>
               </select>
             </div>
-          </div>
+          </div>          {/* Access Permissions */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">User Permissions</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ToggleSwitch
+                  id="caseEntry"
+                  checked={caseEntry === "1"}
+                  onChange={(checked) => setCaseEntry(checked ? "1" : "0")}
+                  label="Case Entry Access"
+                />
+                
+                <ToggleSwitch
+                  id="caseView"
+                  checked={caseView === "1"}
+                  onChange={(checked) => setCaseView(checked ? "1" : "0")}
+                  label="Case View Access"
+                />
+                
+                <ToggleSwitch
+                  id="analytics"
+                  checked={analytics === "1"}
+                  onChange={(checked) => setAnalytics(checked ? "1" : "0")}
+                  label="Analytics Access"
+                />
+                
+                <ToggleSwitch
+                  id="chat"
+                  checked={chat === "1"}
+                  onChange={(checked) => setChat(checked ? "1" : "0")}
+                  label="Chat Access"
+                />
+              </div>
+            </div>
 
           <div>
             <Button
