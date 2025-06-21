@@ -34,7 +34,8 @@ export const CaseViewPage: React.FC<PageProps> = ({ onNavigate }) => {
   const [editSuccess, setEditSuccess] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string>('');
-  const [deleteSuccess, setDeleteSuccess] = useState<string>('');  const [showFilters, setShowFilters] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState<string>(''); 
+  const [showFilters, setshowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState(''); const [filters, setFilters] = useState<Record<string, string | undefined>>({});
   
   // Pagination state
@@ -225,7 +226,7 @@ export const CaseViewPage: React.FC<PageProps> = ({ onNavigate }) => {
           <Button
             variant="secondary"
             icon={Filter}
-            onClick={() => setShowFilters(!showFilters)}
+            onClick={() => setshowFilters(!showFilters)}
           >
             Filters
           </Button>
@@ -322,11 +323,12 @@ export const CaseViewPage: React.FC<PageProps> = ({ onNavigate }) => {
                   </label>
                   <select
                     value={filters.District || ''}
-                    onChange={(e) => handleFilterChange('district', e.target.value)}
+                    onChange={(e) => handleFilterChange('District', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
                   >
-                    <option value="">All Districts</option>                {uniqueValues('district').map(district => (
-                      <option key={district} value={String(district)}>{String(district)}</option>
+                    <option value="">All Districts</option>   
+                    {uniqueValues('District').map(District => (
+                      <option key={District} value={String(District)}>{String(District)}</option>
                     ))}
                   </select>
                 </div>
@@ -422,7 +424,8 @@ export const CaseViewPage: React.FC<PageProps> = ({ onNavigate }) => {
           <Card>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead>              <tr className="border-b border-gray-200 dark:border-gray-700">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">CR No</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Accused Name</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Crime Type</th>
@@ -434,7 +437,8 @@ export const CaseViewPage: React.FC<PageProps> = ({ onNavigate }) => {
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Age</th>
                   <th className="text-center py-3 px-4 font-medium text-gray-900 dark:text-white">Actions</th>
                 </tr>
-                </thead>                <tbody>
+                </thead>
+                <tbody>
                   {paginatedCases.map((case_, index) => (<tr key={case_.id} className={`border-b border-gray-100 dark:border-gray-800 ${index % 2 === 0 ? 'bg-gray-50/50 dark:bg-gray-800/50' : ''}`}>
                     <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{case_.CR_NO}</td>
                     <td className="py-3 px-4 text-gray-900 dark:text-white">{case_.Accused_Name}</td>
@@ -444,7 +448,8 @@ export const CaseViewPage: React.FC<PageProps> = ({ onNavigate }) => {
                     <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.Police_Station}</td>
                     <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.Section_of_law}</td>
                     <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.Accused_Gender}</td>
-                    <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.Accused_Age}</td>                    <td className="py-3 px-4">
+                    <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{case_.Accused_Age}</td>
+                    <td className="py-3 px-4">
                       <div className="flex justify-center space-x-2">
                       <Button
                         size="sm"
@@ -468,7 +473,8 @@ export const CaseViewPage: React.FC<PageProps> = ({ onNavigate }) => {
                     </td>
                   </tr>
                   ))}
-                </tbody>              </table>
+                </tbody>
+                </table>
               
               {/* Pagination Info and Controls */}
               {filteredCases.length > 0 && (
