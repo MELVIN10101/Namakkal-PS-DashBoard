@@ -10,7 +10,7 @@ const CRIME_TYPES = [
   'Drug Possession', 'Domestic Violence', 'Burglary', 'Murder', 'Kidnapping'
 ];
 
-const YEARS = Array.from({ length: 6 }, (_, i) => 2000 + i);
+const YEARS = Array.from({ length: new Date().getFullYear() - 1999 }, (_, i) => 2000 + i);
 const GENDERS = ['Male', 'Female', 'Others'];
 
 export const CaseEntryPage: React.FC<PageProps> = ({ onNavigate }) => {

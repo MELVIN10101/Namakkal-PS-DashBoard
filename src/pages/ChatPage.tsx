@@ -66,7 +66,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) => {
                 <Phone className="w-5 h-5 mr-2 text-blue-500" />
                 <span className="font-medium text-gray-900 dark:text-white">Phone</span>
               </div>
-              <span className="text-gray-600 dark:text-gray-300">+91 9876543210</span>
+              <span className="text-gray-600 dark:text-gray-300">+91 7548836965</span>
             </div>
             
             <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -74,7 +74,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) => {
                 <Mail className="w-5 h-5 mr-2 text-blue-500" />
                 <span className="font-medium text-gray-900 dark:text-white">Email</span>
               </div>
-              <span className="text-gray-600 dark:text-gray-300">donsekarin@gmail.com</span>
+              <span className="text-gray-600 dark:text-gray-300">donesekarin@gmail.com</span>
             </div>
             
             <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow">
